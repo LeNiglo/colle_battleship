@@ -43,9 +43,12 @@ class Parser
 
             case 'quit':
             case 'exit':
-            default:
             echo 'Bye !' . PHP_EOL;
             return false;
+
+            default:
+            echo 'Unknown command: ' . $cmd . PHP_EOL;
+            return true;
         }
     }
 
@@ -176,7 +179,7 @@ class Battleship
         do {
             $input = readline('$> ');
             $ret = $parser->parse($input);
-        } while ($input && $ret);
+        } while (!is_null($input) && $ret !== false);
     }
 }
 

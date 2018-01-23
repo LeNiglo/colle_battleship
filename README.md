@@ -5,8 +5,9 @@
     // OR
     require_once('procedural.php');
 
-    colle(5, 3, [
+    colle(4, 8, [
         [0, 0],
         [3, 2],
+        [3, 6],
     ]);
 ```
