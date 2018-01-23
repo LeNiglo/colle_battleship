@@ -44,50 +44,60 @@ class Parser
             case 'quit':
             case 'exit':
             default:
-            echo "Bye !\n";
+            echo 'Bye !' . PHP_EOL;
             return false;
         }
     }
 
-    private function query(array $args, bool $display = true)
+    private function query(array $args)
     {
-        foreach ($this->instance->coords as $index => $coord) {
+        if (is_array($args) && count($args) === 2) {
             if (
-                is_array($coord) && count($coord) === 2 && is_array($args) && count($args) === 2 &&
-                $coord[0] == $args[0] && $coord[1] == $args[1]
+                is_array($coord) && count($coord) === 2 &&
+                $this->instance->check_coord($args[0], $args[1]) !== false
             ) {
-                if ($display === true) {
-                    echo "full\n";
-                }
-                return $index;
+                echo 'full' . PHP_EOL;
+                return false;
+            } else {
+                echo 'empty' . PHP_EOL;
+                return true;
             }
+        } else {
+            echo 'Invalid args' . PHP_EOL;
+            return false;
         }
-        if ($display === true) {
-            echo "empty\n";
-        }
-        return false;
     }
 
     private function add(array $args)
     {
-        if ($this->query($args, false) !== false) {
-            echo "A cross already exists at this location\n";
-            return false;
+        if (is_array($args) && count($args) === 2) {
+            if ($this->instance->check_coord($args[0], $args[1]) !== false) {
+                echo 'A cross already exists at this location' . PHP_EOL;
+                return false;
+            } else {
+                array_push($this->instance->coords, $args);
+                return true;
+            }
         } else {
-            array_push($this->instance->coords, $args);
-            return true;
+            echo 'Invalid args' . PHP_EOL;
+            return false;
         }
     }
 
     private function remove(array $args)
     {
-        $idx = $this->query($args, false);
-        if ($idx === false) {
-            echo "No cross exists at this location\n";
-            return false;
+        if (is_array($args) && count($args) === 2) {
+            $idx = $this->instance->check_coord($args[0], $args[1]);
+            if ($idx === false) {
+                echo 'No cross exists at this location' . PHP_EOL;
+                return false;
+            } else {
+                array_splice($this->instance->coords, $idx, $idx + 1);
+                return true;
+            }
         } else {
-            array_splice($this->instance->coords, $idx, $idx + 1);
-            return true;
+            echo 'Invalid args' . PHP_EOL;
+            return false;
         }
     }
 }
@@ -112,11 +122,11 @@ class Battleship
         $this->coords = $coords;
     }
 
-    private function check_coord()
+    public function check_coord(int $x, int $y)
     {
-        foreach ($this->coords as $coord) {
-            if (is_array($coord) && count($coord) === 2 && $coord[0] == $this->x && $coord[1] == $this->y) {
-                return true;
+        foreach ($this->coords as $idx => $coord) {
+            if (is_array($coord) && count($coord) === 2 && $coord[0] == $x && $coord[1] == $y) {
+                return $idx;
             }
         }
         return false;
@@ -128,7 +138,7 @@ class Battleship
             if ($this->x === 0) {
                 echo '|';
             }
-            echo $this->check_coord() ? ' X |' : '   |';
+            echo $this->check_coord($this->x, $this->y) !== false ? ' X |' : '   |';
         }
         if ($this->width > 0) {
             echo PHP_EOL;
